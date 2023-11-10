@@ -35,3 +35,6 @@
 4.5 Al presionar "Up" se borra la terminal y me muestra el mapa del laberinto completamente funcional
 
 4.6 Al completar el laberinto se muestra un mensaje de felicitaciones (no he podido hacer que el mensaje se muestre, me pueden ayudar con esto, por favor)
+
+5.0 Al completar el laberinto salta el mensaje de felicidades
+

@@ -45,8 +45,7 @@ def jugar(laberinto, px, py, posicion_final):
         if direccion in [key.DOWN, key.LEFT, key.RIGHT, key.UP]:
             px, py = mover_personaje(laberinto, direccion, px, py)
 
-        if (px, py) == posicion_final:
-            break
+    return px, py
 
 def mostrar_mapa(laberinto):
     borrar_terminal()
@@ -80,7 +79,7 @@ cadena_mapa = """
 matriz_laberinto = mapa(cadena_mapa)
 
 posicion_inicial = (0, 0)
-posicion_final = (21, 21)
+posicion_final = (20, 20)
 
 px, py = posicion_inicial
 matriz_laberinto[px][py] = 'P'
@@ -109,10 +108,10 @@ while True:
         print("Arriba")
         mostrar_mapa(matriz_laberinto)
         px, py = jugar(matriz_laberinto, px, py, posicion_final)
-        
-    if (px, py) == posicion_final:
+
+        if (px, py) == posicion_final:
             print("Felicidades, Has completado el laberinto")
-            break  
+            break
 
     elif k == 'n':
         borrar_terminal()
