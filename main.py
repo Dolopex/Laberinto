@@ -1,123 +1,154 @@
 import os
+import random
 from readchar import readkey, key
 
-def borrar_terminal():
-    os.system('cls' if os.name == 'nt' else 'clear')
+class Juego:
+    def __init__(self, laberinto, posicion_inicial, posicion_final):
+        self.laberinto = [list(fila) for fila in laberinto.split('\n')]
+        self.posicion_inicial = posicion_inicial
+        self.posicion_final = posicion_final
+        self.px, self.py = posicion_inicial
+        self.laberinto[self.px][self.py] = 'P'
 
-def mapa(cadena_mapa):
-    filas = cadena_mapa.strip().split('\n')
-    laberinto = []
+    def borrar_terminal(self):
+        os.system('cls' if os.name == 'nt' else 'clear')
 
-    for fila in filas:
-        caracteres_fila = list(fila)
-        laberinto.append(caracteres_fila)
+    def mover_personaje(self, direccion):
+        nueva_px, nueva_py = self.px, self.py
 
-    return laberinto
+        if direccion == key.DOWN:
+            nueva_px += 1
+        elif direccion == key.LEFT:
+            nueva_py -= 1
+        elif direccion == key.RIGHT:
+            nueva_py += 1
+        elif direccion == key.UP:
+            nueva_px -= 1
 
-def mover_personaje(laberinto, direccion, px, py):
-    nueva_px, nueva_py = px, py
+        if (
+            0 <= nueva_px < len(self.laberinto) and
+            0 <= nueva_py < len(self.laberinto[0]) and
+            self.laberinto[nueva_px][nueva_py] != '#'
+        ):
+            self.laberinto[self.px][self.py] = '.'
+            self.px, self.py = nueva_px, nueva_py
+            self.laberinto[self.px][self.py] = 'P'
 
-    if direccion == key.DOWN:
-        nueva_px += 1
-    elif direccion == key.LEFT:
-        nueva_py -= 1
-    elif direccion == key.RIGHT:
-        nueva_py += 1
-    elif direccion == key.UP:
-        nueva_px -= 1
+    def jugar(self):
+        while (self.px, self.py) != self.posicion_final:
+            self.mostrar_mapa()
+            direccion = readkey()
 
-    if (
-        0 <= nueva_px < len(laberinto) and
-        0 <= nueva_py < len(laberinto[0]) and
-        laberinto[nueva_px][nueva_py] != '#'
-    ):
-        laberinto[px][py] = '.'
-        px, py = nueva_px, nueva_py
-        laberinto[px][py] = 'P'
+            if direccion in [key.DOWN, key.LEFT, key.RIGHT, key.UP]:
+                self.mover_personaje(direccion)
 
-    return px, py
+    def mostrar_mapa(self):
+        self.borrar_terminal()
+        for fila in self.laberinto:
+            print("".join(fila))
 
-def jugar(laberinto, px, py, posicion_final):
-    while (px, py) != posicion_final:
-        mostrar_mapa(laberinto)
-        direccion = readkey()
+class JuegoArchivo(Juego):
+    def __init__(self, path_a_mapas):
+        self.path_a_mapas = path_a_mapas
 
-        if direccion in [key.DOWN, key.LEFT, key.RIGHT, key.UP]:
-            px, py = mover_personaje(laberinto, direccion, px, py)
+    def leer_mapa(self, nombre_archivo):
+        path_completo = os.path.join(self.path_a_mapas, nombre_archivo)
 
-    return px, py
+        try:
+            with open(path_completo, 'r') as file:
+                contenido = file.read()
 
-def mostrar_mapa(laberinto):
-    borrar_terminal()
-    for fila in laberinto:
-        print("".join(fila))
+            print("Contenido del archivo:")
+            print(contenido)
 
-cadena_mapa = """
-..###################
-....................#
-#.###.#.###.###.#####
-#.#.#.#.#.....#.#...#
-#.#.###.#.###.#####.#
-#.#.#...#.#...#.#...#
-###.#.###.#.###.###.#
-#.#.#.#...#.........#
-#.#.#.#.#.###.###.###
-#.....#.#.#.....#...#
-#.#.#.###.###.#####.#
-#.#.#...#...#.#.....#
-###.#.###.#######.###
-#...#...#...#.......#
-###########.###.#####
-#...#.......#.....#.#
-#.###.#######.#####.#
-#...#.......#...#.#.#
-#.#.#.#########.#.#.#
-#.#.....#...........#
-###################..
-"""
+            # Separar las líneas del archivo
+            lineas = contenido.strip().splitlines()
+            print("Líneas:")
+            print(lineas)
 
-matriz_laberinto = mapa(cadena_mapa)
+            # Verificar que las coordenadas tengan el formato correcto
+            if len(lineas) < 3 or ',' not in lineas[0] or ',' not in lineas[1]:
+                raise ValueError("El archivo de mapa no tiene el formato esperado.")
 
-posicion_inicial = (0, 0)
-posicion_final = (20, 20)
+            # Separar las dimensiones y posiciones inicial y final
+            dimensiones = tuple(map(int, lineas[0].replace(',', ' ').split()))
+            if len(dimensiones) != 4:
+                raise ValueError("Las dimensiones y posiciones iniciales/finales del laberinto no son válidas.")
 
-px, py = posicion_inicial
-matriz_laberinto[px][py] = 'P'
+            filas, columnas, px, py = dimensiones
+            posicion_inicial = (px, py)
 
-Jugador = input("Escribe Tu Nombre: ")
-print(f"Bienvenido/a, {Jugador}")
+            # Separar las coordenadas finales
+            posicion_final = tuple(map(int, lineas[1].replace(',', ' ').split()))
 
-print("Probemos los controles: Muevete usando (UP, DOWN, LEFT, RIGHT). Y presiona n para sumar un número")
-print("Cuando estés listo, presiona UP para iniciar el laberinto.")
+            # Obtener el contenido del mapa sin las primeras tres líneas
+            mapa = '\n'.join(lineas[2:])
 
-numero = 0
+            # Ajustar la dimensión del laberinto si es necesario
+            while len(mapa.split('\n')) < filas:
+                mapa += '\n' + ' ' * columnas
 
-while True:
-    k = readkey()
+            return dimensiones, posicion_inicial, posicion_final, mapa.strip()
 
-    if k == key.DOWN:
-        print("Abajo")
+        except Exception as e:
+            print(f"Error al leer el mapa: {e}")
+            raise
 
-    elif k == key.LEFT:
-        print("Izquierda")
+    def obtener_mapa_aleatorio(self):
+        archivos_mapas = os.listdir(self.path_a_mapas)
+        nombre_archivo = random.choice(archivos_mapas)
+        return self.leer_mapa(nombre_archivo)
 
-    elif k == key.RIGHT:
-        print("Derecha")
+    def iniciar_juego(self, dimensiones, posicion_inicial, posicion_final, mapa):
+        filas, columnas, _, _ = dimensiones
+        super().__init__(mapa, posicion_inicial, posicion_final)
+        self.jugar()
 
-    elif k == key.UP:
-        print("Arriba")
-        mostrar_mapa(matriz_laberinto)
-        px, py = jugar(matriz_laberinto, px, py, posicion_final)
+def main():
+    path_a_mapas = "carpeta_de_mapas"  
+    juego_archivo = JuegoArchivo(path_a_mapas)
+    
+    Jugador = input("Escribe Tu Nombre: ")
+    print(f"Bienvenido/a, {Jugador}")
 
-        if (px, py) == posicion_final:
-            print("Felicidades, Has completado el laberinto")
-            break
+    print("Probemos los controles: Muevete usando (UP, DOWN, LEFT, RIGHT). Y presiona n para sumar un número")
+    print("Cuando estés listo, presiona UP para iniciar el laberinto.")
 
-    elif k == 'n':
-        borrar_terminal()
-        print(f"Número actual: {numero}")
-        numero += 1
-        if numero > 50:
-            numero = 0
-    else:
-        print(k)
+    numero = 0
+
+    while True:
+        k = readkey()
+
+        if k == key.DOWN:
+            print("Abajo")
+
+        elif k == key.LEFT:
+            print("Izquierda")
+
+        elif k == key.RIGHT:
+            print("Derecha")
+
+        elif k == key.UP:
+            print("Arriba")
+            try:
+                dimensiones, posicion_inicial, posicion_final, mapa = juego_archivo.obtener_mapa_aleatorio()
+                juego_archivo.iniciar_juego(dimensiones, posicion_inicial, posicion_final, mapa)
+            except ValueError as e:
+                print(f"Error al leer el mapa: {e}")
+                continue
+
+            if (juego_archivo.px, juego_archivo.py) == juego_archivo.posicion_final:
+                print("Felicidades, Has completado el laberinto")
+                break
+
+        elif k == 'n':
+            juego_archivo.borrar_terminal()
+            print(f"Número actual: {numero}")
+            numero += 1
+            if numero > 50:
+                numero = 0
+        else:
+            print(k)
+
+if __name__ == "__main__":
+    main()
