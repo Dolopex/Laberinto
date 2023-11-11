@@ -35,3 +35,21 @@
 4.5 Al presionar "Up" se borra la terminal y me muestra el mapa del laberinto completamente funcional
 
 4.6 Al completar el laberinto se muestra un mensaje de felicitaciones (no he podido hacer que el mensaje se muestre, me pueden ayudar con esto, por favor)
+
+5.0 Al completar el laberinto salta el mensaje de felicitaciones
+
+5.1 Se encapsula el juego usando la clase "Juego" y se le asignan los atributos de :laberinto, posicion inicial, posicion final y las funciones se le adjuntan a la clase
+
+5.2 El juego se instancia y se ejecuta desde "main"
+
+5.3 Se importa la libreria "random" para que se escoja un laberinto aleatoriamente
+
+5.4 Se crea la carpeta "carpeta_de_mapas" donde se almaenan los archivos de mapa en formato "txt"
+
+5.5 Se crea otra clase llamada "JuegoArchivo" la cual hereda de "Juego" la funcion para leer los archivos y hacer que las funciones de moverse, mensaje final, paredes y pasillo se ajusten a cada mapa
+
+5.6 Se crea una funcion encargada de mostrar un "ValueError" si el formato del archivo del mapa es incorrecto, si no tiene las coordenadas correctas, si salta uno de estos errores hay unos condicionales que mostraran el archivo como un "str" que verifica que se lee bien pero que un error debe ser corregido antes de poder jugar
+
+5.7 los archivos de mapas deben ser en formato txt y las 2 primerras lineas deben mostrar: (ancho,alto,posicion inicial y posicion final)
+
+
