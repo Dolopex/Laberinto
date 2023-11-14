@@ -52,4 +52,8 @@
 
 5.7 los archivos de mapas deben ser en formato txt y las 2 primerras lineas deben mostrar: (ancho,alto,posicion inicial y posicion final)
 
+6.0 Se importa reduce desde functools
 
+6.1 Se crea una funcion que convierta el mapa en una matriz
+
+6.2 Nn la función "leer_mapa" se concatenan las filas con reduce

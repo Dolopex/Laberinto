@@ -1,10 +1,11 @@
 import os
 import random
 from readchar import readkey, key
+from functools import reduce
 
 class Juego:
     def __init__(self, laberinto, posicion_inicial, posicion_final):
-        self.laberinto = [list(fila) for fila in laberinto.split('\n')]
+        self.laberinto = self.convertir_a_matriz(laberinto)
         self.posicion_inicial = posicion_inicial
         self.posicion_final = posicion_final
         self.px, self.py = posicion_inicial
@@ -47,6 +48,11 @@ class Juego:
         for fila in self.laberinto:
             print("".join(fila))
 
+    def convertir_a_matriz(self, laberinto_str): #Parte 6
+        return list(map(list, laberinto_str.split('\n')))
+
+
+
 class JuegoArchivo(Juego):
     def __init__(self, path_a_mapas):
         self.path_a_mapas = path_a_mapas
@@ -56,19 +62,10 @@ class JuegoArchivo(Juego):
 
         try:
             with open(path_completo, 'r') as file:
-                contenido = file.read()
+                lineas = file.readlines()
 
-            print("Contenido del archivo:")
-            print(contenido)
-
-            # Separar las líneas del archivo
-            lineas = contenido.strip().splitlines()
-            print("Líneas:")
-            print(lineas)
-
-            # Verificar que las coordenadas tengan el formato correcto
-            if len(lineas) < 3 or ',' not in lineas[0] or ',' not in lineas[1]:
-                raise ValueError("El archivo de mapa no tiene el formato esperado.")
+            # Concatenar las filas usando reduce
+            mapa = reduce(lambda x, y: x + y, lineas[2:], "").strip() # Parte 6
 
             # Separar las dimensiones y posiciones inicial y final
             dimensiones = tuple(map(int, lineas[0].replace(',', ' ').split()))
@@ -80,9 +77,6 @@ class JuegoArchivo(Juego):
 
             # Separar las coordenadas finales
             posicion_final = tuple(map(int, lineas[1].replace(',', ' ').split()))
-
-            # Obtener el contenido del mapa sin las primeras tres líneas
-            mapa = '\n'.join(lineas[2:])
 
             # Ajustar la dimensión del laberinto si es necesario
             while len(mapa.split('\n')) < filas:
@@ -103,6 +97,7 @@ class JuegoArchivo(Juego):
         filas, columnas, _, _ = dimensiones
         super().__init__(mapa, posicion_inicial, posicion_final)
         self.jugar()
+
 
 def main():
     path_a_mapas = "carpeta_de_mapas"  
