@@ -56,4 +56,4 @@
 
 6.1 Se crea una funcion que convierta el mapa en una matriz
 
-6.2 Nn la función "leer_mapa" se concatenan las filas con reduce
+6.2 En la función "leer_mapa" se concatenan las filas con reduce
